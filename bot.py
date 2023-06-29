@@ -8,8 +8,14 @@ from cogs.music import MusicCog
 from config import config
 
 from events import on_ready
+from player import AudioProvider
+from yt import Youtube
 
 load_dotenv()
+
+
+def get_default_provider() -> AudioProvider:
+    return Youtube()
 
 
 def create_intents() -> discord.Intents:
@@ -26,20 +32,20 @@ def create_bot() -> Bot:
     return bot
 
 
-def run_bot() -> None:
+async def run_bot() -> None:
     token = os.environ.get("TOKEN")
     bot = create_bot()
-    bot.run(token)
-    init_bot(bot)
+    await init_bot(bot)
+    await bot.start(token)
 
 
-def init_bot(bot: Bot) -> None:
-    init_cogs(bot)
+async def init_bot(bot: Bot) -> None:
+    await init_cogs(bot)
     init_events(bot)
 
 
-def init_cogs(bot: Bot) -> None:
-    bot.add_cog(MusicCog(bot))
+async def init_cogs(bot: Bot) -> None:
+    await bot.add_cog(MusicCog(bot, provider=get_default_provider()))
 
 
 def init_events(bot: Bot) -> None:
