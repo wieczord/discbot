@@ -8,6 +8,7 @@ from cogs.music import MusicCog
 from config import config
 
 from events import on_ready
+from music_queue import AsyncQueue, MusicQueue
 from player import AudioProvider
 from yt import Youtube
 
@@ -16,6 +17,10 @@ load_dotenv()
 
 def get_default_provider() -> AudioProvider:
     return Youtube()
+
+
+def get_default_queue() -> MusicQueue:
+    return AsyncQueue()
 
 
 def create_intents() -> discord.Intents:
@@ -28,7 +33,7 @@ def create_intents() -> discord.Intents:
 
 
 def create_bot() -> Bot:
-    bot = Bot(command_prefix=config['PREFIX'], intents=create_intents())
+    bot = Bot(command_prefix=config["PREFIX"], intents=create_intents())
     return bot
 
 
@@ -45,8 +50,10 @@ async def init_bot(bot: Bot) -> None:
 
 
 async def init_cogs(bot: Bot) -> None:
-    await bot.add_cog(MusicCog(bot, provider=get_default_provider()))
+    await bot.add_cog(
+        MusicCog(bot, provider=get_default_provider(), queue=get_default_queue())
+    )
 
 
 def init_events(bot: Bot) -> None:
-    bot.add_listener(on_ready, 'on_ready')
+    bot.add_listener(on_ready, "on_ready")
