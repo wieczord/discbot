@@ -10,7 +10,7 @@ config = {
             {
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "aac",
-                "preferredquality": "64",
+                "preferredquality": "128",
             }
         ],
         "noplaylist": True,
