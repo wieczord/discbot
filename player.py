@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from functools import partial
 from typing import Protocol, TypeAlias, Optional
 
@@ -13,8 +14,22 @@ class SourceFetchError(Exception):
     ...
 
 
-class AudioProvider(Protocol):
+class AudioProvider(ABC):
     def get_source(self, song: SongName | URL) -> Optional[StreamableSource]:
+        if self.is_url(song):
+            return self.get_from_url(song)
+        return self.get_from_name(song)
+
+    @abstractmethod
+    def is_url(self, song: SongName | URL) -> bool:
+        ...
+
+    @abstractmethod
+    def get_from_url(self, song: URL) -> StreamableSource | None:
+        ...
+
+    @abstractmethod
+    def get_from_name(self, song):
         ...
 
 
@@ -48,8 +63,12 @@ class MusicPlayer(Player):
 
         client.play(discord.FFmpegPCMAudio(source), after=partial(self.play, client))
 
-    async def add_to_queue(self, channel_id: int, url: URL) -> None:
-        source = self.audio_provider.get_source(url)
+    async def add_to_queue(
+        self,
+        channel_id: int,
+        song: SongName | URL | None = None,
+    ) -> None:
+        source = self.audio_provider.get_source(song)
         if not source:
             raise SourceFetchError
         self.music_queue.add(channel_id, source)

@@ -25,13 +25,13 @@ class MusicCog(Cog):
         self.voice_client = None
 
     @command()
-    async def play(self, ctx, song: SongName | URL | None = None):
+    async def play(self, ctx, *, song: SongName | URL | None = None):
         if self.voice_client is None:
             await ctx.invoke(self.join)
         try:
             self.player.play(song=song, client=self.voice_client)
         except SourceFetchError:
-            await ctx.send("No song found")
+            await ctx.send("No song to play. Please provide a URL or a song name.")
 
     @command()
     async def stop(self, ctx):
@@ -51,9 +51,9 @@ class MusicCog(Cog):
         await ctx.invoke(self.play)
 
     @command()
-    async def queue(self, ctx, url: str = ""):
+    async def queue(self, ctx, *, song: SongName | URL | None = None):
         try:
-            await self.player.add_to_queue(url=url, channel_id=self.channel_id)
-            await ctx.send(f"Added {url} to queue")
+            await self.player.add_to_queue(song=song, channel_id=self.channel_id)
+            await ctx.send(f"Added {song} to queue")
         except SourceFetchError:
-            await ctx.send(f"Could not add {url} to queue")
+            await ctx.send(f"Could not add {song} to queue")
