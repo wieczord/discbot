@@ -15,5 +15,6 @@ config = {
         ],
         "noplaylist": True,
         "extractaudio": True,
+        'outtmpl': "downloads/%(id)s.%(ext)s",
     },
 }
